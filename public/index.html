@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatBot</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-box"></div>
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button id="send-button">Send</button>
+    </div>
+
+    <script src="script.js">
+        document.getElementById('send-button').addEventListener('click', () => {
+    const userInput = document.getElementById('user-input').value;
+    const userId = getUserId();
+
+    fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ input: userInput, userId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        displayMessage(data.message);
+        document.getElementById('user-input').value = '';
+    });
+});
+
+function displayMessage(message) {
+    const chatBox = document.getElementById('chat-box');
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    chatBox.appendChild(messageElement);
+}
+
+function getUserId() {
+    let userId = localStorage.getItem('userId');
+    if (!userId) {
+        userId = generateUserId();
+        localStorage.setItem('userId', userId);
+    }
+    return userId;
+}
+
+function generateUserId() {
+    return 'user-' + Math.random().toString(36).substr(2, 9);
+}
+    </script>
+</body>
+</html>
